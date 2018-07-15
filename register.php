@@ -15,7 +15,7 @@
         $password = $_POST['password'];
      
         // check if user is already existed with the same email
-        if ($db->isUserExisted($email)) 
+        if ($db->userExists($email)) 
         {
             // user already existed
             $response["error"] = TRUE;

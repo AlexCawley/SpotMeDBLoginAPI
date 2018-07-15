@@ -5,7 +5,6 @@ class DB_Functions
  
     private $conn;
  
-    // constructor
     function __construct() 
     {
         require_once 'DB_Connect.php';
@@ -14,10 +13,8 @@ class DB_Functions
         $this->conn = $db->connect();
     }
  
-    // destructor
     function __destruct() 
     {
-         
     }
  
     /**
@@ -52,12 +49,41 @@ class DB_Functions
             return false;
         }
     }
+
+    /**
+     * Storing new contact
+     * returns contact details
+     */
+    public function storeContact($name, $email) 
+    {
+        $uuid = uniqid('', true);
+ 
+        $stmt = $this->conn->prepare("INSERT INTO contatcs(unique_id, name, email, created_at, user_id) VALUES(?, ?, ?, NOW(), ?)");
+        $stmt->bind_param("sssss", $uuid, $name, $email, $user_id);
+        $result = $stmt->execute();
+        $stmt->close();
+ 
+        if ($result) 
+        {
+            $stmt = $this->conn->prepare("SELECT * FROM users WHERE name = ?");
+            $stmt->bind_param("s", $name);
+            $stmt->execute();
+            $contact = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+ 
+            return $contact;
+        } 
+        else 
+        {
+            return false;
+        }
+    }
  
     /**
      * Get user by email and password
      */
-    public function getUserByEmailAndPassword($email, $password)
-     {
+    public function getUserByEmailAndPassword($email, $password) 
+    {
  
         $stmt = $this->conn->prepare("SELECT * FROM users WHERE email = ?");
  
@@ -73,12 +99,33 @@ class DB_Functions
             $encrypted_password = $user['encrypted_password'];
             $hash = $this->checkhashSSHA($salt, $password);
             // check for password equality
-            if ($encrypted_password == $hash) 
-            {
+            if ($encrypted_password == $hash) {
                 // user authentication details are correct
                 return $user;
             }
-        } 
+        }
+        else 
+        {
+            return NULL;
+        }
+    }
+
+     /**
+     * Get user by email and password
+     */
+    public function getContactByName($name) 
+    {
+ 
+        $stmt = $this->conn->prepare("SELECT * FROM contatcs WHERE name = ?");
+ 
+        $stmt->bind_param("s", $name);
+ 
+        if ($stmt->execute()) 
+        {
+            $contact = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+            return $contact;
+        }
         else 
         {
             return NULL;
@@ -86,9 +133,9 @@ class DB_Functions
     }
  
     /**
-     * Check user is existed or not
+     * Check user if exists or not
      */
-    public function isUserExisted($email) 
+    public function userExists($email) 
     {
         $stmt = $this->conn->prepare("SELECT email from users WHERE email = ?");
  
@@ -106,7 +153,7 @@ class DB_Functions
         } 
         else 
         {
-            // user not existed
+            // user does not exist
             $stmt->close();
             return false;
         }
@@ -131,7 +178,7 @@ class DB_Functions
      * @param salt, password
      * returns hash string
      */
-    public function checkhashSSHA($salt, $password) 
+    public function checkHashSSHA($salt, $password) 
     {
         $hash = base64_encode(sha1($password . $salt, true) . $salt);
  

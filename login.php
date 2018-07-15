@@ -6,8 +6,8 @@
     // json response array
     $response = array("error" => FALSE);
      
-    if (isset($_POST['email']) && isset($_POST['password']))
-    { 
+    if (isset($_POST['email']) && isset($_POST['password'])) 
+    {
         // receiving the post params
         $email = $_POST['email'];
         $password = $_POST['password'];
@@ -41,5 +41,4 @@
         $response["error_msg"] = "Required parameters email or password is missing!";
         echo json_encode($response);
     }
-
 ?>
