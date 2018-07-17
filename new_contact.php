@@ -5,12 +5,18 @@
      
     $response = array("error" => FALSE);
      
-    if (isset($_POST['name'])) 
+    if (isset($_POST['name']) && isset($_POST['user_id'])) 
     {
         $name = $_POST['name'];
-        $email = $_POST['email'];
+        $user_id = $_POST['user_id'];
+        $email = null;
 
-        $contact = $db->storeContact($name, $email);
+        if(isset($_POST['email']))
+        {
+            $email = $_POST['email'];
+        }
+
+        $contact = $db->storeContact($name, $email, $user_id);
         if ($contact) 
         {
             $response["error"] = FALSE;
@@ -31,7 +37,7 @@
     else 
     {
         $response["error"] = TRUE;
-        $response["error_msg"] = "Required parameters, name or email, missing";
+        $response["error_msg"] = "Required parameters, name or user_id, missing";
         echo json_encode($response);
     }
     

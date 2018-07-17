@@ -54,19 +54,19 @@ class DB_Functions
      * Storing new contact
      * returns contact details
      */
-    public function storeContact($name, $email) 
+    public function storeContact($name, $email, $user_id) 
     {
         $uuid = uniqid('', true);
  
-        $stmt = $this->conn->prepare("INSERT INTO contatcs(unique_id, name, email, created_at, user_id) VALUES(?, ?, ?, NOW(), ?)");
+        $stmt = $this->conn->prepare("INSERT INTO contatcs(unique_id, name, email, created_at, updated_at, user_id) VALUES(?, ?, ?, NOW(), NOW(), ?)");
         $stmt->bind_param("sssss", $uuid, $name, $email, $user_id);
         $result = $stmt->execute();
         $stmt->close();
  
         if ($result) 
         {
-            $stmt = $this->conn->prepare("SELECT * FROM users WHERE name = ?");
-            $stmt->bind_param("s", $name);
+            $stmt = $this->conn->prepare("SELECT * FROM users WHERE name = ? AND user_id = ");
+            $stmt->bind_param("ss", $name, $user_id);
             $stmt->execute();
             $contact = $stmt->get_result()->fetch_assoc();
             $stmt->close();
@@ -111,14 +111,36 @@ class DB_Functions
     }
 
      /**
-     * Get user by email and password
+     * Get contact by name and userid
      */
-    public function getContactByName($name) 
+    public function getContactByNameAndUserId($name, $user_id) 
     {
  
-        $stmt = $this->conn->prepare("SELECT * FROM contatcs WHERE name = ?");
+        $stmt = $this->conn->prepare("SELECT * FROM contatcs WHERE name = ? AND user_id = ?");
  
-        $stmt->bind_param("s", $name);
+        $stmt->bind_param("ss", $name, $user_id);
+ 
+        if ($stmt->execute()) 
+        {
+            $contact = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+            return $contact;
+        }
+        else 
+        {
+            return NULL;
+        }
+    }
+
+     /**
+     * Get all contacts associated with a single user id
+     */
+    public function getAllContactsByUserId($user_id) 
+    {
+ 
+        $stmt = $this->conn->prepare("SELECT * FROM contatcs WHERE user_id = ?");
+ 
+        $stmt->bind_param("s", $user_id);
  
         if ($stmt->execute()) 
         {
