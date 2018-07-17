@@ -138,7 +138,7 @@ class DB_Functions
     public function getAllContactsByUserId($user_id) 
     {
  
-        $stmt = $this->conn->prepare("SELECT * FROM contatcs WHERE user_id = ?");
+        $stmt = $this->conn->prepare("SELECT * FROM contacts WHERE user_id = ?");
  
         $stmt->bind_param("s", $user_id);
  

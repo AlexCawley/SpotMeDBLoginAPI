@@ -17,7 +17,8 @@
         if ($contacts != false) 
         {
             // use is found
-            while ($row = mysql_fetch_array($contacts, MYSQL_NUM)) {
+            while ($row = mysql_fetch_array($contacts, MYSQL_NUM)) 
+            {
                 $response["error"] = false;
                 $response["uid"] = $row["unique_id"];
                 $response["contact"]["name"] = $row["name"];
