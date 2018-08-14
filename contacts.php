@@ -11,17 +11,16 @@
      
         $contacts = $db->getAllContactsByUserId($user_id);
      
-        if ($contacts != false) 
+        if ($contacts) 
         {
-            while ($row = mysql_fetch_array($contacts, MYSQL_NUM)) 
+            $response["error"] = FALSE;
+            $response["error_msg"] = "Contacts queried successfully";
+            while($row = mysqli_fetch_array($contacts, MYSQL_NUM))
             {
-                $response["error"] = false;
-                $response["uid"] = $row["unique_id"];
                 $response["contact"]["name"] = $row["name"];
                 $response["contact"]["email"] = $row["email"];
-                $response["contact"]["created_at"] = $row["created_at"];
                 $response["contact"]["updated_at"] = $row["updated_at"];
-                $response["contact"]["user_id"] = $row["user_id"];
+                $response["contact"]["created_at"] = $row["created_at"];
             }
             echo json_encode($response);
         } 
